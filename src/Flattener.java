@@ -27,20 +27,26 @@ public class Flattener {
                 .forEach(this::copyFile);
     }
 
-    public void copyFile(Path path) {
-        String file = path.getFileName().toString();
-        String copy = outDir + File.separator + file;
-        try {
-            Files.copy (path, Paths.get(copy), StandardCopyOption.REPLACE_EXISTING);
-            System.out.print('.');
-            if (++tick == 100)
-            {
-                System.out.println();
-                tick = 0;
+    public void copyFile (Path srcPath) {
+        String srcFileName = srcPath.getFileName().toString();
+        String dstPath = outDir + File.separator + srcFileName;
+        int cnt = 1;
+        for(;;) {
+            try {
+                Files.copy(srcPath, Paths.get(dstPath), StandardCopyOption.COPY_ATTRIBUTES);
+                System.out.print('.');
+                if (++tick == 100) {
+                    System.out.println();
+                    tick = 0;
+                }
+                break;
+            } catch (Exception e) {
+                //System.out.println(e);
+                //System.exit(-1);
+                //System.out.println("cpy fail: " + copy);
+                dstPath = outDir + File.separator + cnt + "-" + srcFileName;
+                cnt++;
             }
-        } catch (IOException e) {
-            System.out.println(e);
-            System.exit(-1);
         }
     }
 
